@@ -29,8 +29,8 @@ using System.Windows.Forms;
 
 namespace Revit.SDK.Samples.ParameterUtils.CS
 {
-  /// <summary>
-  /// display a Revit element property-like form related to the selected element.
+  /// <summary> display a Revit element property-like form
+  ///           related to the selected element.
   /// </summary>
   [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
   [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
@@ -38,8 +38,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
   public class Command : IExternalCommand
   {
     #region IExternalCommand Members
-    /// <summary>
-    /// Implement this method as an external command for Revit.
+    /// <summary> Implement this method as an external command for Revit.
     /// </summary>
     /// <param name="commandData">An object that is passed to the external application 
     /// which contains data related to the command, 
