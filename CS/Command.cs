@@ -104,7 +104,17 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
           StringBuilder sb = new StringBuilder();
 
           // the name of the parameter can be found from its definition.
-          sb.AppendFormat("{0}\t", param.Definition.Name);
+          var name = param.Definition.Name;
+          sb.AppendFormat("{0}\t", name);
+
+          if (insOrType.ContainsKey(param.Id))
+          {
+            sb.AppendFormat("{0}\t", insOrType[param.Id] ? "Inst" : "Type");
+          }
+          else
+          {
+            sb.AppendFormat("{0}\t", "-");
+          }
 
           // Revit parameters can be one of 5 different internal storage types:
           // double, int, string, Autodesk.Revit.DB.ElementId and None. 

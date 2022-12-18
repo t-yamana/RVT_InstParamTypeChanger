@@ -54,7 +54,8 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
 
             // create three columns with "Name", "Type" and "Value"
             propertyListView.Columns.Add("Name");
-            propertyListView.Columns.Add("Type");
+            propertyListView.Columns.Add("Inst/Type");
+            propertyListView.Columns.Add("DataType");
             propertyListView.Columns.Add("Value");
 
             // loop all the strings, split them, and add them to rows of the list view
@@ -84,5 +85,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
             // the last column fit the rest of the list view
             propertyListView.Columns[propertyListView.Columns.Count - 1].Width = -2;
         }
+
+        private void PropertiesForm_Load(object sender, EventArgs e) { }
     }
 }
