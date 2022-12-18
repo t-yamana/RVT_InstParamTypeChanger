@@ -26,6 +26,7 @@ using Autodesk.Revit.UI;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using Autodesk.Revit.UI.Selection;
 
 namespace Revit.SDK.Samples.ParameterUtils.CS
 {
@@ -61,30 +62,38 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
 
       Autodesk.Revit.UI.UIApplication app = commandData.Application;
 
+      var uidoc = commandData.Application.ActiveUIDocument;
+      var doc = uidoc.Document;
+      var reference = uidoc.Selection.PickObject(ObjectType.Element);
+
       // get the elements selected
       // The current selection can be retrieved from the active 
       // document via the selection object
-      ElementSet seletion = new ElementSet();
-      foreach (ElementId elementId in app.ActiveUIDocument.Selection.GetElementIds())
-      {
-        seletion.Insert(app.ActiveUIDocument.Document.GetElement(elementId));
-      }
+      var elem = doc.GetElement(reference);
+      var famSmb = (doc.GetElement(reference) as FamilyInstance)?.Symbol;
 
       // we need to make sure that only one element is selected.
-      if (seletion.Size == 1)
+      if (famSmb != null)
       {
         // we need to get the first and only element in the selection. Do this by getting 
         // an iterator. MoveNext and then get the current element.
-        ElementSetIterator it = seletion.ForwardIterator();
-        it.MoveNext();
-        Element element = it.Current as Element;
+
+        var famDoc = doc.EditFamily(famSmb.Family);
 
         // Next we need to iterate through the parameters of the element,
         // as we iterating, we will store the strings that are to be displayed
         // for the parameters in a string list "parameterItems"
         List<string> parameterItems = new List<string>();
-        ParameterSet parameters = element.Parameters;
-        foreach (Parameter param in parameters)
+
+        FamilyParameterSet parameters = famDoc.FamilyManager.Parameters;
+        var insOrType = new Dictionary<ElementId, bool>();
+        foreach (FamilyParameter param in parameters)
+        {
+          insOrType.Add(param.Id, param.IsInstance);
+        }
+
+        var typeElem = doc.GetElement(elem.GetTypeId());
+        foreach (Parameter param in typeElem.Parameters)
         {
           if (param == null) continue;
 
