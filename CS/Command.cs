@@ -23,10 +23,9 @@
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using Autodesk.Revit.UI.Selection;
+using System;
+using System.Windows.Forms;
 
 namespace Revit.SDK.Samples.ParameterUtils.CS
 {
@@ -39,6 +38,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
   public class Command : IExternalCommand
   {
     #region IExternalCommand Members
+
     /// <summary> Implement this method as an external command for Revit.
     /// </summary>
     /// <param name="commandData">An object that is passed to the external application 
@@ -57,67 +57,28 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
     public Autodesk.Revit.UI.Result Execute(ExternalCommandData commandData, ref string message,
         ElementSet elements)
     {
-      // set out default result to failure.
-      Autodesk.Revit.UI.Result retRes = Autodesk.Revit.UI.Result.Failed;
-
-      Autodesk.Revit.UI.UIApplication app = commandData.Application;
+      Result retRes = Result.Failed;  // Default Result
 
       var uidoc = commandData.Application.ActiveUIDocument;
+
       var doc = uidoc.Document;
       var reference = uidoc.Selection.PickObject(ObjectType.Element);
 
-      // get the elements selected
-      // The current selection can be retrieved from the active 
-      // document via the selection object
-      var elem = doc.GetElement(reference);
-      var famSmb = (doc.GetElement(reference) as FamilyInstance)?.Symbol;
-
-      // we need to make sure that only one element is selected.
-      if (famSmb != null)
+      try
       {
-        // we need to get the first and only element in the selection. Do this by getting 
-        // an iterator. MoveNext and then get the current element.
-
-        var famDoc = doc.EditFamily(famSmb.Family);
-
-        // Next we need to iterate through the parameters of the element,
-        // as we iterating, we will store the strings that are to be displayed
-        // for the parameters in a string list "parameterItems"
-        List<string> parameterItems = new List<string>();
-
-        FamilyParameterSet parameters = famDoc.FamilyManager.Parameters;
-        var insOrType = new Dictionary<ElementId, bool>();
-        foreach (FamilyParameter param in parameters)
+        using (var form = new PropertiesForm(doc, reference))
         {
-          insOrType.Add(param.Id, param.IsInstance);
+          form.StartPosition = FormStartPosition.CenterParent;
+          if (DialogResult.OK == form.ShowDialog())
+          {
+            ; // TODO:
+          }
         }
-
-        var typeElem = doc.GetElement(elem.GetTypeId());
-        var converter = new ParamTextConverter(doc, insOrType);
-
-        foreach (Parameter param in typeElem.Parameters)
-        {
-          if (param == null) continue;
-          // add the completed line to the string list
-          parameterItems.Add(converter.Pass(param));
-        }
-
-        foreach (Parameter param in elem.Parameters)
-        {
-          if (param == null) continue;
-          // add the completed line to the string list
-          parameterItems.Add(converter.Pass(param));
-        }
-
-        // Create our dialog, passing it the parameters array for display.
-        PropertiesForm propertiesForm = new PropertiesForm(parameterItems.ToArray());
-        propertiesForm.StartPosition = FormStartPosition.CenterParent;
-        propertiesForm.ShowDialog();
-        retRes = Autodesk.Revit.UI.Result.Succeeded;
+        retRes = Result.Succeeded;
       }
-      else
+      catch (Exception ex)
       {
-        message = "Please select only one element";
+        message = ex.Message;
       }
       return retRes;
     }

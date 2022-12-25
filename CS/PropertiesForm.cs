@@ -23,69 +23,91 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
+using Autodesk.Revit.DB;
 
 namespace Revit.SDK.Samples.ParameterUtils.CS
 {
-    public partial class PropertiesForm : System.Windows.Forms.Form
+
+  public partial class PropertiesForm : System.Windows.Forms.Form
+  {
+    /// <summary> Default constructor, initialize all controls
+    /// </summary>
+    private PropertiesForm() { InitializeComponent(); }
+    private void PropertiesForm_Load(object sender, EventArgs e) { }
+
+    /// <summary> This Form is used to display the parameters Which only
+    ///           Type or Instance parameters (Built-In parameters are not included)
+    /// </summary>
+    /// <param name="information"> A string array that will be loaded into the list view
+    /// </param>
+    public PropertiesForm(Document doc, Reference reference)
+        : this()
     {
-        /// <summary>
-        /// Default constructor, initialize all controls
-        /// </summary>
-        private PropertiesForm()
-        {
-            InitializeComponent();
-        }
+      var famParams = ParamExtractor.FamParams(doc, reference);
+      var insOrType = new Dictionary<ElementId, bool>();
+      foreach (FamilyParameter param in famParams)
+      {
+        insOrType.Add(param.Id, param.IsInstance);
+      }
 
-        /// <summary>
-        /// This Form is used to display the properties that exist upon an element. 
-        /// It consists of a list view and the ok, cancel buttons.
-        /// </summary>
-        /// <param name="information">A string array that will be loaded into the list view</param>
-        public PropertiesForm(string[] information)
-            : this()
-        {
-            // we need to add each string in to each row of the list view, and split the string
-            // into substrings delimited by '\t' then put them into the columns of the row.
+      var parameters = ParamExtractor.Params(doc, reference);
 
-            // create three columns with "Name", "Type" and "Value"
-            propertyListView.Columns.Add("Name");
-            propertyListView.Columns.Add("Inst/Type");
-            propertyListView.Columns.Add("DataType");
-            propertyListView.Columns.Add("Value");
+      // create columns for ListView
+      propertyListView.Columns.Add("Name");
+      propertyListView.Columns.Add("Inst/Type");
+      propertyListView.Columns.Add("DataType");
+      propertyListView.Columns.Add("Value");
 
-            // loop all the strings, split them, and add them to rows of the list view
-            foreach (string row in information)
-            {
-                if (row == null) continue;
-                ListViewItem lvi = new ListViewItem(row.Split('\t'));
-                propertyListView.Items.Add(lvi);
-            }
+      FieldType[] types = {
+        FieldType.Name,
+        FieldType.InstOrType,
+        FieldType.DataType,
+        FieldType.Value };
 
-            // The following code is used to sort and resize the columns within the list view 
-            // so that the data can be viewed better.
+      // we need to add each string in to each row of the list view,
+      // and split the string
+      // into substrings delimited by '\t' then put them into the columns of the row.
+      var converter = new ParamTextConverter(doc, insOrType);
 
-            // sort the items in the list view ordered by ascending.
-            propertyListView.Sorting = SortOrder.Ascending;
+      // Next we need to iterate through the parameters of the element,
+      // as we iterating, we will store the strings that are to be displayed
+      // for the parameters in a string list "parameterItems"
 
-            // make the column width fit the content
-            propertyListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+      // loop all the strings, split them, and add them to rows of the list view
+      foreach (Parameter param in parameters)
+      {
+        if (param == null) continue;
 
-            // increase the width of columns by 40, make them a litter wider
-            int span = 40;
-            foreach (ColumnHeader ch in propertyListView.Columns)
-            {
-                ch.Width += span;
-            }
+        ListViewItem lvi = new ListViewItem(converter.Pass(param, types).Split('\t'));
+        propertyListView.Items.Add(lvi);
+      }
 
-            // the last column fit the rest of the list view
-            propertyListView.Columns[propertyListView.Columns.Count - 1].Width = -2;
-        }
-
-        private void PropertiesForm_Load(object sender, EventArgs e) { }
+      Formatting();
     }
+
+    private void Formatting()
+    {
+      // sort the items in the list view ordered by ascending.
+      propertyListView.Sorting = SortOrder.Ascending;
+      // make the column width fit the content
+      propertyListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+
+      // increase the width of columns by 40, make them a litter wider
+      int span = 40;
+      foreach (ColumnHeader ch in propertyListView.Columns)
+      {
+        ch.Width += span;
+      }
+      // the last column fit the rest of the list view
+      propertyListView.Columns[propertyListView.Columns.Count - 1].Width = -2;
+    }
+
+
+    private void buttonToType_Click(object sender, EventArgs e)
+    {
+      ;  // TODO:
+    }
+  }
 }
+
