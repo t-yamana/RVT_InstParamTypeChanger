@@ -2,9 +2,13 @@
 
 namespace Revit.SDK.Samples.ParameterUtils.CS
 {
-  internal static class ParamExtractor
+  internal class ParamExtractor
   {
-    public static FamilyParameterSet FamParams(Document doc, Reference refer)
+    internal Document Famdoc { get; private set; }
+    internal FamilyParameterSet FamParams { get; private set; }
+    internal ParameterSet Params { get; private set; }
+
+    public ParamExtractor(Document doc, Reference refer)
     {
       var elem = doc.GetElement(refer);
       var famSmb = (elem as FamilyInstance)?.Symbol;
@@ -15,29 +19,25 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
         // We need to get the first and only element in the selection.
         // Do this by getting an iterator.
         // MoveNext and then get the current element.
-        var famDoc = doc.EditFamily(famSmb.Family);
-        return famDoc.FamilyManager.Parameters;
+        Famdoc = doc.EditFamily(famSmb.Family);
+        FamParams = Famdoc.FamilyManager.Parameters;
       }
       else
       {
-        return new FamilyParameterSet();
+        FamParams = new FamilyParameterSet();
       }
-    }
 
-    public static ParameterSet Params(Document doc, Reference refer)
-    {
-      var elem = doc.GetElement(refer);
       ParameterSet parameters = new ParameterSet();
       foreach (Parameter p in elem.Parameters)
       {
-        parameters.Insert(p);
+        parameters.Insert(p);  // Instance Parameter Only
       }
       var typeElem = doc.GetElement(elem.GetTypeId());
       foreach (Parameter p in typeElem.Parameters)
       {
-        parameters.Insert(p);
+        parameters.Insert(p);  // Type Parameter Only
       }
-      return parameters;
+      Params = parameters;
     }
   }
 }

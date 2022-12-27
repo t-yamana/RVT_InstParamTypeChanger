@@ -44,14 +44,15 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
     public PropertiesForm(Document doc, Reference reference)
         : this()
     {
-      var famParams = ParamExtractor.FamParams(doc, reference);
+      var extractor = new ParamExtractor(doc, reference);
+      _famParams = extractor.FamParams;
       var insOrType = new Dictionary<ElementId, bool>();
-      foreach (FamilyParameter param in famParams)
+      foreach (FamilyParameter param in _famParams)
       {
         insOrType.Add(param.Id, param.IsInstance);
       }
 
-      var parameters = ParamExtractor.Params(doc, reference);
+      var parameters = extractor.Params;
 
       // create columns for ListView
       propertyListView.Columns.Add("Name");
