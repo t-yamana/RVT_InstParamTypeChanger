@@ -53,6 +53,8 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
         {
       this.okButton = new System.Windows.Forms.Button();
       this.propertyListView = new System.Windows.Forms.ListView();
+      this.buttonToType = new System.Windows.Forms.Button();
+      this.buttonToInst = new System.Windows.Forms.Button();
       this.SuspendLayout();
       // 
       // okButton
@@ -80,6 +82,25 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
       this.propertyListView.UseCompatibleStateImageBehavior = false;
       this.propertyListView.View = System.Windows.Forms.View.Details;
       // 
+      // buttonToType
+      // 
+      this.buttonToType.Location = new System.Drawing.Point(172, 636);
+      this.buttonToType.Name = "buttonToType";
+      this.buttonToType.Size = new System.Drawing.Size(75, 23);
+      this.buttonToType.TabIndex = 3;
+      this.buttonToType.Text = "ToType";
+      this.buttonToType.UseVisualStyleBackColor = true;
+      this.buttonToType.Click += new System.EventHandler(this.buttonToType_Click);
+      // 
+      // buttonToInst
+      // 
+      this.buttonToInst.Location = new System.Drawing.Point(282, 636);
+      this.buttonToInst.Name = "buttonToInst";
+      this.buttonToInst.Size = new System.Drawing.Size(75, 23);
+      this.buttonToInst.TabIndex = 4;
+      this.buttonToInst.Text = "ToInst";
+      this.buttonToInst.UseVisualStyleBackColor = true;
+      // 
       // PropertiesForm
       // 
       this.AcceptButton = this.okButton;
@@ -87,6 +108,8 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.okButton;
       this.ClientSize = new System.Drawing.Size(473, 668);
+      this.Controls.Add(this.buttonToInst);
+      this.Controls.Add(this.buttonToType);
       this.Controls.Add(this.propertyListView);
       this.Controls.Add(this.okButton);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -104,5 +127,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
 
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.ListView propertyListView;
+        private System.Windows.Forms.Button buttonToType;
+        private System.Windows.Forms.Button buttonToInst;
     }
 }

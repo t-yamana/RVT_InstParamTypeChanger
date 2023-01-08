@@ -36,6 +36,10 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
     private PropertiesForm() { InitializeComponent(); }
     private void PropertiesForm_Load(object sender, EventArgs e) { }
 
+    FamilyParameterSet _famParams;
+    Document _doc;
+    Document _famDoc;
+
     /// <summary> This Form is used to display the parameters Which only
     ///           Type or Instance parameters (Built-In parameters are not included)
     /// </summary>
@@ -44,12 +48,22 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
     public PropertiesForm(Document doc, Reference reference)
         : this()
     {
+      _doc = doc;
       var extractor = new ParamExtractor(doc, reference);
       _famParams = extractor.FamParams;
+      _famDoc = extractor.FamDoc;
+
       var insOrType = new Dictionary<ElementId, bool>();
-      foreach (FamilyParameter param in _famParams)
+      var iterator = _famParams.GetEnumerator();
+      iterator.Reset();
+      while (iterator.MoveNext())
       {
-        insOrType.Add(param.Id, param.IsInstance);
+        object famParam = iterator.Current;
+        FamilyParameter fp = famParam as FamilyParameter;
+        if (fp != null)
+        {
+          insOrType.Add(fp.Id, fp.IsInstance);
+        }
       }
 
       var parameters = extractor.Params;
@@ -83,6 +97,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
         ListViewItem lvi = new ListViewItem(converter.Pass(param, types).Split('\t'));
         propertyListView.Items.Add(lvi);
       }
+      // TODO: Make a sign for Built-In param becauz cannot be converted
 
       Formatting();
     }
@@ -107,7 +122,40 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
 
     private void buttonToType_Click(object sender, EventArgs e)
     {
-      ;  // TODO:
+      var names = new HashSet<string>();
+      foreach (ListViewItem row in propertyListView.SelectedItems)
+      {
+        names.Add(row.SubItems[0].Text);  // name
+      }
+
+      // CAUTION: how to initialize Array
+      FamilyParameter[] targetParams = new FamilyParameter[names.Count];
+
+      var iterator = _famParams.GetEnumerator();
+      int i = 0;
+      iterator.Reset();
+      while (iterator.MoveNext())
+      {
+        object famParam = iterator.Current;
+        FamilyParameter fp = famParam as FamilyParameter;
+        if (names.Contains(fp.Definition.Name))
+        // if (names.Contains(fp?.Definition.Name))
+        {
+          targetParams[i] = fp;
+          i += 1;
+        }
+      }
+
+      var modifier = new FamModifier(_doc, _famDoc);
+      try
+      {
+        modifier.Convert2Type(targetParams);
+      }
+      catch (Exception ex)
+      {
+        // TODO: Now there are NO catch statement for here!
+        throw ex;
+      }
     }
   }
 }
