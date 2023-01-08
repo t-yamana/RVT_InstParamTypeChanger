@@ -4,7 +4,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
 {
   internal class ParamExtractor
   {
-    internal Document Famdoc { get; private set; }
+    internal Document FamDoc { get; private set; }
     internal FamilyParameterSet FamParams { get; private set; }
     internal ParameterSet Params { get; private set; }
 
@@ -19,8 +19,8 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
         // We need to get the first and only element in the selection.
         // Do this by getting an iterator.
         // MoveNext and then get the current element.
-        Famdoc = doc.EditFamily(famSmb.Family);
-        FamParams = Famdoc.FamilyManager.Parameters;
+        FamDoc = doc.EditFamily(famSmb.Family);
+        FamParams = FamDoc.FamilyManager.Parameters;
       }
       else
       {
