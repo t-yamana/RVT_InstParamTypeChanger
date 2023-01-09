@@ -125,9 +125,47 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
       var names = new HashSet<string>();
       foreach (ListViewItem row in propertyListView.SelectedItems)
       {
-        names.Add(row.SubItems[0].Text);  // name
+        names.Add(row.SubItems[0].Text);  // 0: name
       }
+      
+      // TODO: use this as Singleton
+      var modifier = new FamModifier(_doc, _famDoc);
 
+      var targetParams = selectedFamParams(names);
+      try
+      {
+        modifier.Convert2Type(targetParams, true);
+      }
+      catch (Exception ex)
+      {
+        throw ex;  // TODO: Now there are NO catch statement for here!
+      }
+    }
+
+    private void buttonToInst_Click(object sender, EventArgs e)
+    {
+      var names = new HashSet<string>();
+      foreach (ListViewItem row in propertyListView.SelectedItems)
+      {
+        names.Add(row.SubItems[0].Text);  // 0: name
+      }
+      
+      // TODO: use this as Singleton
+      var modifier = new FamModifier(_doc, _famDoc);
+
+      var targetParams = selectedFamParams(names);
+      try
+      {
+        modifier.Convert2Type(targetParams, false);
+      }
+      catch (Exception ex)
+      {
+        throw ex;  // TODO: Now there are NO catch statement for here!
+      }
+    }
+
+    private FamilyParameter[] selectedFamParams(HashSet<string> names)
+    {
       // CAUTION: how to initialize Array
       FamilyParameter[] targetParams = new FamilyParameter[names.Count];
 
@@ -145,17 +183,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
           i += 1;
         }
       }
-
-      var modifier = new FamModifier(_doc, _famDoc);
-      try
-      {
-        modifier.Convert2Type(targetParams);
-      }
-      catch (Exception ex)
-      {
-        // TODO: Now there are NO catch statement for here!
-        throw ex;
-      }
+      return targetParams;
     }
   }
 }

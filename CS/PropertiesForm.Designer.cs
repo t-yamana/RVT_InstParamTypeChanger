@@ -100,6 +100,7 @@ namespace Revit.SDK.Samples.ParameterUtils.CS
       this.buttonToInst.TabIndex = 4;
       this.buttonToInst.Text = "ToInst";
       this.buttonToInst.UseVisualStyleBackColor = true;
+      this.buttonToInst.Click += new System.EventHandler(this.buttonToInst_Click);
       // 
       // PropertiesForm
       // 

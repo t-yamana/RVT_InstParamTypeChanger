@@ -18,18 +18,26 @@ namespace Revit.SDK.Samples.ParameterUtils
       _famDoc = famDoc;
     }
 
-    public void Convert2Type(FamilyParameter[] targetParams)
+    public void Convert2Type(FamilyParameter[] targetParams, bool inst2Type)
     {
       Transaction famdocts = new Transaction(_famDoc, "Parameter type change");
 
       Document updatedFamDoc =_famDoc;
       foreach (var p in targetParams)
       {
-        famdocts.Start();
-        updatedFamDoc.FamilyManager.MakeType(p);  // need transact one by one
+        famdocts.Start();  // need transact one by one
+        if (inst2Type)
+        {
+          updatedFamDoc.FamilyManager.MakeType(p);
+        }
+        else
+        {
+          updatedFamDoc.FamilyManager.MakeInstance(p);
+        }
         famdocts.Commit();
       }
 
+      // Family file was not overwrite saved!
       updatedFamDoc.LoadFamily(_doc, new LoadOpt());
       _famDoc = updatedFamDoc;  // only completed family substituted
     }
